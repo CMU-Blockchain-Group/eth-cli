@@ -36,7 +36,7 @@ async function main() {
 	program
 		.command('sendBatch <amount> <address-csv-file>')
 		.requiredOption('-s, --signer <path>', 'path to file contining mnemonic for signer')
-		.option("-n, --network <network-name>', 'network to connect to. Currently only supports 'mainnet' and 'polygon-mainnet'")
+		.option('-n, --network <network-name>', "network to connect to. Currently only supports 'mainnet' and 'polygon-mainnet'")
 		.description('send <amount> to every address in <address-csv-file>')
 		.action(async (amount, addresses_path, options) => {
 			const signer = loadFromMnemonic(options.signer, options.network);
