@@ -36,14 +36,16 @@ async function main() {
 	program
 		.command('sendBatch <amount> <address-csv-file>')
 		.requiredOption('-s, --signer <path>', 'path to file contining mnemonic for signer')
-		.option("-n, --network <network-name>', 'network to connect to. Currently only supports 'mainnet' and 'polygon-mainnet'")
+		.option('-n, --network <network-name>', "network to connect to. Currently only supports 'mainnet' and 'polygon-mainnet'")
+		.option('-c, --column <col>', "column of given csv that contains desired addresses. Error if nonexistant. Defaults to 'Ethereum Address'")
 		.description('send <amount> to every address in <address-csv-file>')
 		.action(async (amount, addresses_path, options) => {
 			const signer = loadFromMnemonic(options.signer, options.network);
 
 			const csvStr = fs.readFileSync(addresses_path).toString();
-			const addresses: string[] = parse(csvStr, { columns: true, skip_empty_lines: true }).map((row: any) => row['Ethereum Address']);
-
+			const addresses: string[] = parse(csvStr, { columns: true, skip_empty_lines: true })
+			.map((row: any) => row[options.column ?? 'Ethereum Address']);
+			if (addresses.every(col => !col)) throw 'Column does not exist!';
 			const sendAmount = ethers.utils.parseEther(amount);
 			const nonceOffset = await signer.getTransactionCount();
 			const txResponses = await Promise.all(addresses.map(
